@@ -31,6 +31,7 @@ export async function createTeacher(formData: {
 
     // 2. Profile creation is usually handled by a trigger, but let's be safe and upsert it
     // If the trigger 008_auth_trigger exists, this might be redundant but explicit is better for now
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const { error: profileErr } = await (admin.from('users' as any) as any).upsert({
         id: authUser.user.id,
         email: formData.email,
@@ -81,6 +82,7 @@ export async function updateTeacher(id: string, formData: {
     if (authError) return { success: false, error: authError.message }
 
     // 2. Update Profile
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const { error: profileErr } = await (admin.from('users' as any) as any).update({
         first_name: formData.first_name,
         last_name: formData.last_name,

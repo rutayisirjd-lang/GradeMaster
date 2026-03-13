@@ -12,7 +12,6 @@ import {
     PieChart as PieChartIcon,
     LayoutDashboard,
     ArrowRight,
-    ChevronRight,
     Loader2,
     BarChart3
 } from 'lucide-react'

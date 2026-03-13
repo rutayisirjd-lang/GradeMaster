@@ -119,6 +119,7 @@ export default function MarksPage() {
         queryFn: async () => {
             const { data: { user } } = await supabase.auth.getUser()
             if (!user) return null
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
             const { data } = await (supabase.from('users' as any) as any).select('role').eq('id', user.id).single()
             return data?.role
         }
@@ -200,7 +201,7 @@ export default function MarksPage() {
     })
 
     // 5. Fetch Marks
-    const { data: marks, isLoading: loadingMarks } = useQuery<MarkItem[]>({
+    const { data: marks } = useQuery<MarkItem[]>({
         queryKey: ['marks', assessments?.map(a => a.id)],
         enabled: !!assessments && assessments.length > 0,
         queryFn: async () => {

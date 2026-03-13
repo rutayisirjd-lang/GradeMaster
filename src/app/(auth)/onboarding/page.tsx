@@ -38,6 +38,8 @@ import {
 import { Badge } from '@/components/ui/badge'
 import toast from 'react-hot-toast'
 
+import { Suspense } from 'react'
+
 const onboardingSchema = z.object({
     firstName: z.string().min(2, 'First name is too short'),
     lastName: z.string().min(2, 'Last name is too short'),
@@ -50,7 +52,7 @@ const onboardingSchema = z.object({
 
 type OnboardingForm = z.infer<typeof onboardingSchema>
 
-export default function OnboardingPage() {
+function OnboardingContent() {
     const router = useRouter()
     const searchParams = useSearchParams()
     const token = searchParams.get('token')
@@ -80,8 +82,7 @@ export default function OnboardingPage() {
                 return
             }
 
-            const { data, error } = await supabase
-                .from('invitations')
+            const { data, error } = await (supabase.from('invitations' as any) as any)
                 .select('*')
                 .eq('token', token)
                 .is('accepted_at', null)
@@ -127,8 +128,7 @@ export default function OnboardingPage() {
             if (authError) throw authError
 
             // 2. Mark Invitation as Accepted
-            const { error: inviteError } = await supabase
-                .from('invitations')
+            const { error: inviteError } = await (supabase.from('invitations' as any) as any)
                 .update({ accepted_at: new Date().toISOString() })
                 .eq('id', invitation.id)
 
@@ -308,5 +308,20 @@ export default function OnboardingPage() {
                 </CardFooter>
             </Card>
         </div>
+    )
+}
+
+export default function OnboardingPage() {
+    return (
+        <Suspense fallback={
+            <div className="min-h-screen bg-slate-950 flex items-center justify-center p-6">
+                <div className="flex flex-col items-center gap-4">
+                    <Loader2 className="h-10 w-10 text-emerald-500 animate-spin" />
+                    <p className="text-slate-500 font-bold uppercase tracking-[0.3em] text-[10px]">Initializing...</p>
+                </div>
+            </div>
+        }>
+            <OnboardingContent />
+        </Suspense>
     )
 }

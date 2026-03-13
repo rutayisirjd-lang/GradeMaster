@@ -9,40 +9,26 @@ import {
     CartesianGrid,
     Tooltip,
     ResponsiveContainer,
-    LineChart,
-    Line,
     PieChart,
     Pie,
     Cell,
-    Legend,
     AreaChart,
     Area,
     RadarChart,
     PolarGrid,
     PolarAngleAxis,
-    PolarRadiusAxis,
     Radar
 } from 'recharts'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle, CardFooter } from '@/components/ui/card'
 import {
     Users,
-    UserPlus,
     TrendingUp,
     CheckCircle2,
     AlertCircle,
-    Clock,
-    LayoutDashboard,
-    BarChart4,
-    MapPin,
-    Calendar,
-    School,
     ArrowUpRight,
-    ChevronRight,
-    TrendingDown,
     Monitor,
     Activity,
     Globe,
-    ShieldCheck,
     Loader2
 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
@@ -53,7 +39,7 @@ import { useQuery } from '@tanstack/react-query'
 import { Database } from '@/types/database'
 import { cn } from '@/lib/utils'
 
-type TermSubjectResult = Database['public']['Tables']['term_subject_results']['Row']
+
 
 const fallbackPerfData = [
     { name: 'S1A', avg: 72 },
@@ -91,15 +77,16 @@ export default function AnalyticsPage() {
         queryKey: ['real-analytics'],
         queryFn: async () => {
             const [tsrRes, studentsRes, marksRes] = await Promise.all([
+                // eslint-disable-next-line @typescript-eslint/no-explicit-any
                 (supabase.from('term_subject_results' as any) as any)
                     .select('*, class_subjects(subjects(name), classes(name))'),
                 supabase.from('students').select('id, first_name, last_name, classes(name)'),
                 supabase.from('marks').select('normalized_score, assessment_id, assessments(class_subject_id, class_subjects(classes(name)))')
             ])
 
-            const tsrData = tsrRes.data || []
-            const studentsData = studentsRes.data || []
-            const marksData = marksRes.data || []
+            const tsrData = (tsrRes.data || []) as any[]
+            const studentsData = (studentsRes.data || []) as any[]
+            const marksData = (marksRes.data || []) as any[]
 
             let hasData = tsrData.length > 0
             let isSemiReal = marksData.length > 0 && !hasData
@@ -108,7 +95,7 @@ export default function AnalyticsPage() {
             let schoolAvg = "74.2"
             let passRate = "88.7"
             let perfData = fallbackPerfData
-            let topStudents = []
+            let topStudents: any[] = []
 
             if (hasData) {
                 let total = 0
